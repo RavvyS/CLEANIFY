@@ -2,19 +2,6 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-/**
- * SOLID PRINCIPLE: Single Responsibility Principle (SRP)
- * This controller only handles authentication-related operations
- * Each function handles one specific auth operation (register, login, getProfile, updateProfile)
- */
-
-/**
- * SOLID PRINCIPLE: Dependency Inversion Principle (DIP)
- * This controller depends on the User model abstraction, not concrete implementation
- * We use the User model interface without knowing its internal database details
- */
-
-// Generate JWT token
 const generateToken = (userId) => {
     return jwt.sign(
         { userId },
@@ -23,30 +10,23 @@ const generateToken = (userId) => {
     );
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
 export const register = async (req, res) => {
     try {
         const { name, email, password, role, phone, address, cityId } = req.body;
 
-        // Check if user exists
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Validate role
         const validRoles = ['admin', 'dispatcher', 'collector', 'householder'];
         if (!validRoles.includes(role)) {
             return res.status(400).json({ message: 'Invalid role specified' });
         }
 
-        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create user
         const user = await User.create({
             name,
             email,
@@ -75,9 +55,6 @@ export const register = async (req, res) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -86,27 +63,22 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: 'Please provide email and password' });
         }
 
-        // Find user
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Check if account is active
         if (!user.isActive) {
             return res.status(401).json({ message: 'Your account has been deactivated. Please contact support.' });
         }
 
-        // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Generate token
         const token = generateToken(user._id);
         
-        // Log successful login
         console.log('User logged in:', {
             id: user._id,
             email: user.email,
@@ -131,9 +103,6 @@ export const login = async (req, res) => {
     }
 };
 
-// @desc    Get user profile
-// @route   GET /api/auth/profile
-// @access  Private
 export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password');
@@ -148,9 +117,6 @@ export const getProfile = async (req, res) => {
     }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/auth/profile
-// @access  Private
 export const updateProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);

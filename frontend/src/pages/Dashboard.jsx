@@ -1,4 +1,3 @@
-// src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { 
   Container, 
@@ -37,7 +36,6 @@ import AdminDashboard from '../components/admin/AdminDashboard';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
-// Styled components and animations
 const slideIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -90,7 +88,6 @@ const Dashboard = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [showRequestForm, setShowRequestForm] = useState(false);
 
-  // Mock household data
   const householdStats = {
     totalRequests: 3,
     completedRequests: 12,

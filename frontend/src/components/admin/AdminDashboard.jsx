@@ -40,7 +40,6 @@ import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { wasteRequestAPI, announcementAPI } from '../../services/api';
 import ActivityFeed from './ActivityFeed';
 
-// Animation keyframes
 const pulse = keyframes`
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
@@ -158,7 +157,6 @@ const AdminDashboard = () => {
     binFillRate: 68
   });
 
-  // Sample recent activity data
   const recentActivity = [
     {
       id: 1,
@@ -190,7 +188,6 @@ const AdminDashboard = () => {
     }
   ];
 
-  // Sample insights data
   const insights = [
     {
       title: 'Recycling Rate Increase',

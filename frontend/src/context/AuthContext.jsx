@@ -2,24 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
-/**
- * SOLID PRINCIPLE: Single Responsibility Principle (SRP)
- * AuthContext has one responsibility: Manage authentication state and operations
- * Handles login, logout, user state, and role-based routing
- */
-
-/**
- * SOLID PRINCIPLE: Dependency Inversion Principle (DIP)
- * Components depend on useAuth() hook abstraction, not direct context access
- * AuthProvider depends on authAPI interface, not concrete API implementation
- */
-
-/**
- * SOLID PRINCIPLE: Open/Closed Principle (OCP)
- * Easy to add new auth methods (e.g., social login) without modifying existing code
- * ROLE_ROUTES configuration is open for extension
- */
-
 const AuthContext = createContext(null);
 
 const ROLE_ROUTES = {
@@ -40,7 +22,6 @@ export const AuthProvider = ({ children }) => {
       authAPI.getProfile()
         .then(response => {
           setUser(response.data);
-          // Redirect to role-specific dashboard if on login page
           if (window.location.pathname === '/login') {
             navigate(ROLE_ROUTES[response.data.role]);
           }
@@ -63,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setUser(user);
-      // Redirect to role-specific dashboard
       navigate(ROLE_ROUTES[user.role]);
       return user;
     } catch (error) {
@@ -77,7 +57,6 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setUser(user);
-      // Redirect to role-specific dashboard
       navigate(ROLE_ROUTES[user.role]);
       return user;
     } catch (error) {

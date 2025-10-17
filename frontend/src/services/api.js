@@ -1,23 +1,5 @@
 import axios from 'axios';
 
-/**
- * SOLID PRINCIPLE: Single Responsibility Principle (SRP)
- * This module's responsibility is to handle all API communication
- * Separated by domain (authAPI, wasteRequestAPI, etc.)
- */
-
-/**
- * SOLID PRINCIPLE: Interface Segregation Principle (ISP)
- * Each API object (authAPI, wasteRequestAPI, etc.) provides only relevant methods
- * Clients import only what they need (e.g., only authAPI for login)
- */
-
-/**
- * SOLID PRINCIPLE: Dependency Inversion Principle (DIP)
- * Components depend on these API abstractions, not direct axios calls
- * Easy to swap implementation (e.g., fetch instead of axios) without changing components
- */
-
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api`,
   headers: {
@@ -25,7 +7,6 @@ const api = axios.create({
   }
 });
 
-// Auth interceptor
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -34,7 +15,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// API endpoints
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
