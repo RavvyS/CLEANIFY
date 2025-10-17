@@ -8,15 +8,38 @@ import {
     DialogActions,
     Typography,
     CircularProgress,
-    Alert
+    Alert,
+    Container,
+    useTheme,
+    alpha,
+    styled,
+    Avatar
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { toast } from 'react-toastify';
 import ConfigEditor from '../components/admin/ConfigEditor';
 import ConfigList from '../components/admin/ConfigList';
 import api from '../services/api';
 
+const StyledButton = styled(Button)(({ theme }) => ({
+    borderRadius: '12px',
+    textTransform: 'none',
+    fontWeight: 600,
+    padding: '12px 24px',
+    transition: 'all 0.3s ease',
+    background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+    color: 'white',
+    boxShadow: '0 4px 15px rgba(46, 125, 50, 0.3)',
+    '&:hover': {
+        background: 'linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 6px 20px rgba(46, 125, 50, 0.4)'
+    }
+}));
+
 const CityConfiguration = () => {
+    const theme = useTheme();
     const [configs, setConfigs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -54,7 +77,9 @@ const CityConfiguration = () => {
 
     const handleUpdate = async (configData) => {
         try {
+            // Use the ID-based route for updates to maintain the same record
             const response = await api.put(`/configs/${selectedConfig._id}`, configData);
+            // Update the specific config in the list
             setConfigs(configs.map(config => 
                 config._id === selectedConfig._id ? response.data : config
             ));
@@ -114,54 +139,116 @@ const CityConfiguration = () => {
     }
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h5" component="h1">
-                    City Configurations
-                </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddIcon />}
-                    onClick={() => setIsEditorOpen(true)}
-                >
-                    Add New City
-                </Button>
-            </Box>
+        <Box sx={{
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            minHeight: '100vh',
+            py: 4
+        }}>
+            <Container maxWidth="xl">
+                {/* Header */}
+                <Box sx={{ mb: 4 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                        <Avatar sx={{ 
+                            bgcolor: 'primary.main',
+                            background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+                            width: 64,
+                            height: 64
+                        }}>
+                            <SettingsIcon fontSize="large" />
+                        </Avatar>
+                        <Box>
+                            <Typography variant="h3" sx={{ 
+                                fontWeight: 700,
+                                background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                mb: 0.5
+                            }}>
+                                City Configurations
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary">
+                                Manage city-specific waste collection settings and configurations
+                            </Typography>
+                        </Box>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body1" color="text.secondary">
+                            {configs.length} city configurations
+                        </Typography>
+                        <StyledButton
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={() => setIsEditorOpen(true)}
+                        >
+                            Create New Configuration
+                        </StyledButton>
+                    </Box>
+                </Box>
 
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error}
-                </Alert>
-            )}
+                {loading && (
+                    <Box sx={{ textAlign: 'center', py: 8 }}>
+                        <CircularProgress />
+                        <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
+                            Loading city configurations...
+                        </Typography>
+                    </Box>
+                )}
 
-            <ConfigList
-                configs={configs}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onToggleActive={handleToggleActive}
-            />
+                {error && (
+                    <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-            <Dialog
-                open={isEditorOpen}
-                onClose={handleClose}
-                maxWidth="md"
-                fullWidth
-            >
-                <DialogTitle>
-                    {selectedConfig ? 'Edit City Configuration' : 'Create New City Configuration'}
-                </DialogTitle>
-                <DialogContent>
-                    <ConfigEditor
-                        initialConfig={selectedConfig}
-                        onSubmit={selectedConfig ? handleUpdate : handleCreate}
-                        loading={loading}
+                {!loading && !error && (
+                    <ConfigList
+                        configs={configs}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onToggleActive={handleToggleActive}
                     />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
+                )}
+
+                <Dialog
+                    open={isEditorOpen}
+                    onClose={handleClose}
+                    maxWidth="md"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '20px',
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        background: 'linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%)',
+                        color: 'white',
+                        fontWeight: 600
+                    }}>
+                        {selectedConfig ? 'Edit City Configuration' : 'Create New City Configuration'}
+                    </DialogTitle>
+                    <DialogContent sx={{ p: 4, background: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)' }}>
+                        <ConfigEditor
+                            initialConfig={selectedConfig}
+                            onSubmit={selectedConfig ? handleUpdate : handleCreate}
+                            loading={loading}
+                        />
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2, justifyContent: 'center', borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
+                        <Button 
+                            onClick={handleClose} 
+                            color="secondary" 
+                            variant="outlined"
+                            sx={{ borderRadius: '8px' }}
+                        >
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Container>
         </Box>
     );
 };

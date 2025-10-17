@@ -16,8 +16,16 @@ const routeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Scheduled", "In Progress", "Completed"],
-      default: "Scheduled",
+      enum: ["scheduled", "in-progress", "completed", "cancelled"],
+      default: "scheduled",
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
