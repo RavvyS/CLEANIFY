@@ -2,6 +2,18 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
+/**
+ * SOLID PRINCIPLE: Single Responsibility Principle (SRP)
+ * This controller only handles authentication-related operations
+ * Each function handles one specific auth operation (register, login, getProfile, updateProfile)
+ */
+
+/**
+ * SOLID PRINCIPLE: Dependency Inversion Principle (DIP)
+ * This controller depends on the User model abstraction, not concrete implementation
+ * We use the User model interface without knowing its internal database details
+ */
+
 // Generate JWT token
 const generateToken = (userId) => {
     return jwt.sign(

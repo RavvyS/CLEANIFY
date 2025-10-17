@@ -1,6 +1,18 @@
 import mongoose from 'mongoose';
 const { ValidationError } = mongoose;
 
+/**
+ * SOLID PRINCIPLE: Single Responsibility Principle (SRP)
+ * This middleware has one responsibility: Handle errors centrally
+ * All error formatting and response logic is contained here
+ */
+
+/**
+ * SOLID PRINCIPLE: Open/Closed Principle (OCP)
+ * Easy to extend with new error types without modifying existing error handling
+ * Just add new if/else blocks for different error types
+ */
+
 export const errorHandler = (err, req, res, next) => {
   console.error(err);
 
