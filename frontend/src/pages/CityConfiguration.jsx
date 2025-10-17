@@ -26,7 +26,7 @@ const CityConfiguration = () => {
     const fetchConfigs = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/api/configs');
+            const response = await api.get('/configs');
             setConfigs(response.data);
             setError(null);
         } catch (err) {
@@ -42,7 +42,7 @@ const CityConfiguration = () => {
 
     const handleCreate = async (configData) => {
         try {
-            const response = await api.post('/api/configs', configData);
+            const response = await api.post('/configs', configData);
             setConfigs([...configs, response.data]);
             setIsEditorOpen(false);
             toast.success('City configuration created successfully');
@@ -54,7 +54,7 @@ const CityConfiguration = () => {
 
     const handleUpdate = async (configData) => {
         try {
-            const response = await api.put(`/api/configs/${selectedConfig._id}`, configData);
+            const response = await api.put(`/configs/${selectedConfig._id}`, configData);
             setConfigs(configs.map(config => 
                 config._id === selectedConfig._id ? response.data : config
             ));
@@ -69,7 +69,7 @@ const CityConfiguration = () => {
     const handleDelete = async (configId) => {
         if (window.confirm('Are you sure you want to delete this configuration?')) {
             try {
-                await api.delete(`/api/configs/${configId}`);
+                await api.delete(`/configs/${configId}`);
                 setConfigs(configs.filter(config => config._id !== configId));
                 toast.success('City configuration deleted successfully');
             } catch (err) {
@@ -82,7 +82,7 @@ const CityConfiguration = () => {
     const handleToggleActive = async (configId) => {
         const config = configs.find(c => c._id === configId);
         try {
-            const response = await api.patch(`/api/configs/${configId}`, {
+            const response = await api.patch(`/configs/${configId}`, {
                 isActive: !config.isActive
             });
             setConfigs(configs.map(c => 

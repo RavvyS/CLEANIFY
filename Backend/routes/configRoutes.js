@@ -5,7 +5,9 @@ import {
     getActiveConfig,
     createConfig,
     updateConfig,
-    getConfigVersions
+    getConfigVersions,
+    deleteConfig,
+    toggleConfigActive
 } from '../controllers/configController.js';
 
 const router = express.Router();
@@ -18,10 +20,14 @@ router.route('/')
     .get(getAllConfigs)
     .post(createConfig);
 
-router.route('/:cityId')
+router.route('/:id')
+    .delete(deleteConfig)
+    .patch(toggleConfigActive);
+
+router.route('/city/:cityId')
     .get(getActiveConfig)
     .put(updateConfig);
 
-router.get('/:cityId/versions', getConfigVersions);
+router.get('/city/:cityId/versions', getConfigVersions);
 
 export default router;
