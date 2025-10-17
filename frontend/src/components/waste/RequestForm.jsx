@@ -1,4 +1,3 @@
-// src/components/waste/RequestForm.jsx
 import { useState } from 'react';
 import {
   Dialog,
@@ -36,7 +35,6 @@ import { useAuth } from '../../context/AuthContext';
 
 const wasteTypes = ['Plastic', 'Paper', 'Glass', 'Metal', 'Organic', 'Electronic'];
 
-// Styled components
 const slideIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }

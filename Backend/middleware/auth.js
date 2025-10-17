@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-// Protect routes - verify JWT token
 export const protect = async (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -29,7 +28,6 @@ export const protect = async (req, res, next) => {
     }
 };
 
-// Role-based authorization
 export const authorize = (...roles) => {
     return (req, res, next) => {
         if (!req.user) {
@@ -46,13 +44,11 @@ export const authorize = (...roles) => {
     };
 };
 
-// Specific role middlewares for convenience
 export const adminOnly = authorize('admin');
 export const dispatcherOnly = authorize('dispatcher');
 export const collectorOnly = authorize('collector');
 export const householderOnly = authorize('householder');
 
-// Combined middleware for multiple roles
 export const adminOrDispatcher = authorize('admin', 'dispatcher');
 
 export default protect;

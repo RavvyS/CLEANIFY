@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }) => {
       authAPI.getProfile()
         .then(response => {
           setUser(response.data);
-          // Redirect to role-specific dashboard if on login page
           if (window.location.pathname === '/login') {
             navigate(ROLE_ROUTES[response.data.role]);
           }
@@ -45,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setUser(user);
-      // Redirect to role-specific dashboard
       navigate(ROLE_ROUTES[user.role]);
       return user;
     } catch (error) {
@@ -59,7 +57,6 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       setUser(user);
-      // Redirect to role-specific dashboard
       navigate(ROLE_ROUTES[user.role]);
       return user;
     } catch (error) {

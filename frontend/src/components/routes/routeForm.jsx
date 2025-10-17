@@ -101,13 +101,11 @@ const RouteForm = ({ initialRoute, onSuccess }) => {
         toast.success("Route created successfully!");
       }
 
-      // Clear the form fields
       setTruck("");
       setZones("");
       setDate("");
       setDescription("");
 
-      // Call success callback
       if (onSuccess) {
         onSuccess();
       }

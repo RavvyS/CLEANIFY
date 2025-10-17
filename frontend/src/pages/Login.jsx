@@ -62,7 +62,6 @@ const Login = () => {
       localStorage.setItem("token", token);
       toast.success("Login successful!");
       
-      // Route based on user role
       const roleRoutes = {
         admin: '/admin/dashboard',
         dispatcher: '/dispatcher/dashboard',
