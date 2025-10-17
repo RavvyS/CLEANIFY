@@ -70,36 +70,52 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide email and password' });
+        }
+
         // Find user
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
         // Check if account is active
         if (!user.isActive) {
-            return res.status(401).json({ message: 'Account is deactivated' });
+            return res.status(401).json({ message: 'Your account has been deactivated. Please contact support.' });
         }
 
         // Check password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        res.json({
-            _id: user._id,
-            name: user.name,
+        // Generate token
+        const token = generateToken(user._id);
+        
+        // Log successful login
+        console.log('User logged in:', {
+            id: user._id,
             email: user.email,
-            role: user.role,
-            phone: user.phone,
-            address: user.address,
-            cityId: user.cityId,
-            token: generateToken(user._id)
+            role: user.role
+        });
+        
+        res.json({
+            token,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone,
+                address: user.address,
+                cityId: user.cityId
+            }
         });
     } catch (error) {
         console.error('Login Error:', error);
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Server error occurred during login' });
     }
 };
 
