@@ -13,8 +13,18 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  IconButton,
+  Tooltip,
+  Chip,
+  LinearProgress
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import WarningIcon from '@mui/icons-material/Warning';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import RouteIcon from '@mui/icons-material/Route';
@@ -22,13 +32,40 @@ import GroupIcon from '@mui/icons-material/Group';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { wasteRequestAPI, announcementAPI } from '@/services/api';
 
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  transition: 'transform 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-5px)',
+    boxShadow: theme.shadows[4],
+  }
+}));
+
+const StatBox = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  textAlign: 'center',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.02)',
+    boxShadow: theme.shadows[4],
+  }
+}));
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
-    totalRequests: 0,
-    pendingRequests: 0,
-    activeCollectors: 0,
-    activeRoutes: 0
+    totalRequests: 245,
+    pendingRequests: 18,
+    activeCollectors: 12,
+    activeRoutes: 8,
+    recyclingRate: 42,
+    binFillRate: 68
   });
 
   useEffect(() => {
@@ -84,28 +121,83 @@ const AdminDashboard = () => {
       {/* Stats Overview */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6">{stats.totalRequests}</Typography>
+          <StatBox elevation={2}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.totalRequests}</Typography>
+              <Chip 
+                label="+12% ↑" 
+                size="small" 
+                color="success"
+                icon={<TrendingUpIcon />} 
+              />
+            </Box>
             <Typography variant="body2" color="text.secondary">Total Requests</Typography>
-          </Paper>
+            <LinearProgress 
+              variant="determinate" 
+              value={85} 
+              sx={{ mt: 2, height: 6, borderRadius: 3 }} 
+            />
+          </StatBox>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6">{stats.pendingRequests}</Typography>
+          <StatBox elevation={2}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.pendingRequests}</Typography>
+              <Chip 
+                label="Urgent" 
+                size="small" 
+                color="warning"
+                icon={<WarningIcon />} 
+              />
+            </Box>
             <Typography variant="body2" color="text.secondary">Pending Requests</Typography>
-          </Paper>
+            <LinearProgress 
+              variant="determinate" 
+              value={25} 
+              color="warning"
+              sx={{ mt: 2, height: 6, borderRadius: 3 }} 
+            />
+          </StatBox>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6">{stats.activeCollectors}</Typography>
-            <Typography variant="body2" color="text.secondary">Active Collectors</Typography>
-          </Paper>
+          <StatBox elevation={2}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.recyclingRate}%</Typography>
+              <Chip 
+                label="+5% ↑" 
+                size="small" 
+                color="success"
+                icon={<TrendingUpIcon />} 
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Recycling Rate</Typography>
+            <LinearProgress 
+              variant="determinate" 
+              value={stats.recyclingRate} 
+              color="success"
+              sx={{ mt: 2, height: 6, borderRadius: 3 }} 
+            />
+          </StatBox>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="h6">{stats.activeRoutes}</Typography>
-            <Typography variant="body2" color="text.secondary">Active Routes</Typography>
-          </Paper>
+          <StatBox elevation={2}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{stats.binFillRate}%</Typography>
+              <Chip 
+                label="Normal" 
+                size="small" 
+                color="info"
+                icon={<CheckCircleIcon />} 
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary">Average Bin Fill Rate</Typography>
+            <LinearProgress 
+              variant="determinate" 
+              value={stats.binFillRate} 
+              color="primary"
+              sx={{ mt: 2, height: 6, borderRadius: 3 }} 
+            />
+          </StatBox>
         </Grid>
       </Grid>
 
@@ -113,31 +205,97 @@ const AdminDashboard = () => {
       <Grid container spacing={3}>
         {dashboardCards.map((card, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <StyledCard elevation={3}>
               <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                  {card.icon}
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  mb: 2 
+                }}>
+                  <Box sx={{ 
+                    p: 1, 
+                    borderRadius: '50%', 
+                    backgroundColor: 'primary.light',
+                    display: 'flex'
+                  }}>
+                    {card.icon}
+                  </Box>
+                  <IconButton size="small">
+                    <MoreVertIcon />
+                  </IconButton>
                 </Box>
-                <Typography gutterBottom variant="h6" component="h2" align="center">
+                <Typography gutterBottom variant="h6" component="h2">
                   {card.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" align="center">
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {card.description}
                 </Typography>
               </CardContent>
-              <CardActions>
+              <CardActions sx={{ p: 2, pt: 0 }}>
                 <Button 
-                  size="small" 
+                  size="large" 
                   fullWidth 
                   variant="contained" 
                   onClick={card.action}
+                  sx={{ 
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    py: 1
+                  }}
                 >
                   {card.buttonText}
                 </Button>
               </CardActions>
-            </Card>
+            </StyledCard>
           </Grid>
         ))}
+      </Grid>
+
+      {/* Activity Feed and Insights */}
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Grid item xs={12} md={8}>
+          <ActivityFeed activities={recentActivity} />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2, height: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Insights & Recommendations
+            </Typography>
+            <List>
+              {insights.map((insight, index) => (
+                <ListItem key={index} divider={index < insights.length - 1}>
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {insight.title}
+                        <Chip
+                          size="small"
+                          label={insight.impact}
+                          color={
+                            insight.impact === 'high' ? 'error' :
+                            insight.impact === 'medium' ? 'warning' : 'success'
+                          }
+                          sx={{ ml: 1 }}
+                        />
+                      </Box>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" color="text.secondary">
+                          {insight.description}
+                        </Typography>
+                        <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
+                          Recommendation: {insight.recommendation}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
       </Grid>
     </Container>
   );

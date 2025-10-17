@@ -4,8 +4,7 @@ const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
-  },
-  withCredentials: true
+  }
 });
 
 // Auth interceptor
@@ -19,9 +18,9 @@ api.interceptors.request.use((config) => {
 
 // API endpoints
 export const authAPI = {
-  login: (credentials) => api.post('/users/login', credentials),
-  register: (userData) => api.post('/users/register', userData),
-  getProfile: () => api.get('/users/profile')
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  getProfile: () => api.get('/auth/profile')
 };
 
 export const wasteRequestAPI = {
