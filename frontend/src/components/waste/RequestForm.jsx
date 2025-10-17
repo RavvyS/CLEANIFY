@@ -12,15 +12,18 @@ import {
 } from '@mui/material';
 import { wasteRequestAPI } from '../../services/api';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 
 const wasteTypes = ['Plastic', 'Paper', 'Glass', 'Metal', 'Organic', 'Electronic'];
 
 const RequestForm = ({ open, onClose, onSubmitSuccess }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     wasteType: '',
     quantity: '',
     pickupDate: '',
-    address: ''
+    address: '',
+    userId: user?._id
   });
 
   const handleSubmit = async (e) => {

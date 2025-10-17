@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider } from "./context/AuthContext";
 
 // Import components
 import Navbar from "./components/layout/Navbar";
@@ -9,6 +10,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import CityConfiguration from "./pages/CityConfiguration";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 const theme = createTheme({
@@ -24,25 +26,73 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-        <ToastContainer />
-      </Router>
-    </ThemeProvider>
+    <Router>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/city-configuration"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <CityConfiguration />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Dispatcher Routes */}
+            <Route
+              path="/dispatcher/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['dispatcher']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Collector Routes */}
+            <Route
+              path="/collector/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['collector']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Householder Routes */}
+            <Route
+              path="/householder/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['householder']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Redirect /dashboard to role-specific dashboard */}
+            <Route
+              path="/dashboard"
+              element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+            />
+          </Routes>
+          <ToastContainer />
+        </ThemeProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

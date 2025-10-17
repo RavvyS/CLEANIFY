@@ -29,8 +29,17 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
+    enum: ['admin', 'dispatcher', 'collector', 'householder'],
+    required: [true, "Role is required"]
+  },
+  cityId: {
+    type: String,
+    required: true,
+    ref: 'CityConfig'
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true

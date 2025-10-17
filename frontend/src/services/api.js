@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true
 });
 
 // Auth interceptor
@@ -42,6 +43,16 @@ export const announcementAPI = {
   create: (data) => api.post('/announcements', data),
   update: (id, data) => api.put(`/announcements/${id}`, data),
   delete: (id) => api.delete(`/announcements/${id}`)
+};
+
+export const configAPI = {
+  getAll: () => api.get('/configs'),
+  getActive: (cityId) => api.get(`/configs/${cityId}`),
+  create: (data) => api.post('/configs', data),
+  update: (id, data) => api.put(`/configs/${id}`, data),
+  delete: (id) => api.delete(`/configs/${id}`),
+  toggleActive: (id, isActive) => api.patch(`/configs/${id}`, { isActive }),
+  getVersions: (cityId) => api.get(`/configs/${cityId}/versions`)
 };
 
 export default api;

@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 // Routes
-import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import configRoutes from "./routes/configRoutes.js";
 import wasteRequestRoutes from "./routes/wasteRequestRoutes.js";
 import inquiryRoutes from "./routes/inquiryRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
@@ -27,10 +28,15 @@ mongoose
   .catch((err) => console.error(err));
 
 // Route Middleware
-app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/configs", configRoutes);
 app.use("/api/requests", wasteRequestRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/announcements", announcementRoutes);
+
+// Error handling middleware
+import { errorHandler } from './middleware/errorHandler.js';
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
