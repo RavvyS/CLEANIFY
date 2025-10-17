@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
   },
   cityId: {
     type: String,
-    required: true,
+    required: false,
     ref: 'CityConfig'
   },
   isActive: {

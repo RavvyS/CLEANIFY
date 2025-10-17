@@ -95,6 +95,7 @@ const AnnouncementManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -134,19 +135,31 @@ const AnnouncementManagement = () => {
         }
     };
 
-    const handleOpenDialog = () => {
-        setFormData({
-            title: '',
-            content: '',
-            priority: 'medium',
-            targetAudience: 'all'
-        });
+    const handleOpenDialog = (announcement = null) => {
+        if (announcement) {
+            setEditingId(announcement._id);
+            setFormData({
+                title: announcement.title,
+                content: announcement.content,
+                priority: announcement.priority || 'medium',
+                targetAudience: announcement.targetAudience || 'all'
+            });
+        } else {
+            setEditingId(null);
+            setFormData({
+                title: '',
+                content: '',
+                priority: 'medium',
+                targetAudience: 'all'
+            });
+        }
         setFormErrors({});
         setIsDialogOpen(true);
     };
 
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
+        setEditingId(null);
         setFormData({
             title: '',
             content: '',
@@ -183,16 +196,24 @@ const AnnouncementManagement = () => {
         }
         
         try {
-            const response = await api.post('/announcements', formData);
-            setAnnouncements([response.data, ...announcements]);
+            if (editingId) {
+                const response = await api.put(`/announcements/${editingId}`, formData);
+                setAnnouncements(announcements.map(announcement => 
+                    announcement._id === editingId ? response.data : announcement
+                ));
+                toast.success('Announcement updated successfully');
+            } else {
+                const response = await api.post('/announcements', formData);
+                setAnnouncements([response.data, ...announcements]);
+                toast.success('Announcement created successfully');
+            }
             handleCloseDialog();
-            toast.success('Announcement created successfully');
         } catch (error) {
-            console.error('Error creating announcement:', error);
+            console.error('Error saving announcement:', error);
             if (error.response?.data?.message) {
                 toast.error(error.response.data.message);
             } else {
-                toast.error('Failed to create announcement');
+                toast.error(`Failed to ${editingId ? 'update' : 'create'} announcement`);
             }
         }
     };
@@ -436,7 +457,8 @@ const AnnouncementManagement = () => {
                                             
                                             <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
                                                 <IconButton 
-                                                    size="small" 
+                                                    size="small"
+                                                    onClick={() => handleOpenDialog(announcement)}
                                                     sx={{ 
                                                         width: 32,
                                                         height: 32,
@@ -507,9 +529,9 @@ const AnnouncementManagement = () => {
                             width: 48, 
                             height: 48 
                         }}>
-                            <AddIcon fontSize="large" />
+                            {editingId ? <EditIcon fontSize="large" /> : <AddIcon fontSize="large" />}
                         </Avatar>
-                        Create New Announcement
+                        {editingId ? 'Edit Announcement' : 'Create New Announcement'}
                     </DialogTitle>
                     
                     <DialogContent sx={{ 
@@ -690,7 +712,7 @@ const AnnouncementManagement = () => {
                         <Button
                             onClick={handleSubmit}
                             variant="contained"
-                            startIcon={<AddIcon />}
+                            startIcon={editingId ? <EditIcon /> : <AddIcon />}
                             sx={{
                                 borderRadius: '12px',
                                 minWidth: '140px',
@@ -706,7 +728,7 @@ const AnnouncementManagement = () => {
                                 }
                             }}
                         >
-                            Create Announcement
+                            {editingId ? 'Update Announcement' : 'Create Announcement'}
                         </Button>
                     </DialogActions>
                 </Dialog>
