@@ -13,12 +13,19 @@ import {
 } from '@mui/material';
 import { wasteRequestAPI, announcementAPI } from '../services/api';
 import RequestForm from '../components/waste/RequestForm';
+import AdminDashboard from '../components/admin/AdminDashboard';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [showRequestForm, setShowRequestForm] = useState(false);
+
+  if (user?.role === 'admin') {
+    return <AdminDashboard />;
+  }
 
   useEffect(() => {
     fetchRequests();
@@ -28,18 +35,22 @@ const Dashboard = () => {
   const fetchRequests = async () => {
     try {
       const response = await wasteRequestAPI.getAll();
+      console.log('Waste requests response:', response);
       setRequests(response.data);
     } catch (error) {
-      toast.error('Failed to fetch requests');
+      console.error('Error fetching requests:', error.response?.data || error.message);
+      toast.error(`Failed to fetch requests: ${error.response?.data?.message || error.message}`);
     }
   };
 
   const fetchAnnouncements = async () => {
     try {
       const response = await announcementAPI.getAll();
+      console.log('Announcements response:', response);
       setAnnouncements(response.data);
     } catch (error) {
-      toast.error('Failed to fetch announcements');
+      console.error('Error fetching announcements:', error.response?.data || error.message);
+      toast.error(`Failed to fetch announcements: ${error.response?.data?.message || error.message}`);
     }
   };
 
