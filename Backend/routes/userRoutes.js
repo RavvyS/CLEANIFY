@@ -1,56 +1,118 @@
+// Backend/routes/userRoutes.js
 import express from "express";
 import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-// ✅ Get all users
-router.get("/", async (req, res) => {
+// Register a new user
+router.post("/register", async (req, res) => {
   try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const { name, email, password, address, phone } = req.body;
 
-// ✅ Register new user
-router.post("/", async (req, res) => {
-  try {
-    const user = new User(req.body);
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      address,
+      phone
+    });
+
     await user.save();
-    res.status(201).json(user);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering user", error: error.message });
   }
 });
 
-// ✅ Get user by ID
-router.get("/:id", async (req, res) => {
+// Login user
+router.post("/login", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    user ? res.json(user) : res.status(404).json({ message: "User not found" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const { email, password } = req.body;
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging in", error: error.message });
   }
 });
 
-// ✅ Update user
-router.put("/:id", async (req, res) => {
+// Get user profile
+router.get("/profile", async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    // Get user ID from token
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = await User.findById(decoded.userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching profile", error: error.message });
   }
 });
 
-// ✅ Delete user
-router.delete("/:id", async (req, res) => {
+// Update user profile
+router.put("/profile", async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: "User deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = await User.findByIdAndUpdate(
+      decoded.userId,
+      { $set: req.body },
+      { new: true }
+    ).select('-password');
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile", error: error.message });
   }
 });
 

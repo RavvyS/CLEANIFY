@@ -1,15 +1,36 @@
+// Backend/models/Announcement.js
 import mongoose from "mongoose";
 
 const announcementSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  message: { type: String, required: true },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  expiryDate: { type: Date },
-  visibleTo: { 
-    type: [String], 
-    enum: ["householder", "collector", "all"], 
-    default: ["all"] 
+  title: {
+    type: String,
+    required: [true, "Title is required"],
+    trim: true
+  },
+  content: {
+    type: String,
+    required: [true, "Content is required"],
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: ['general', 'important', 'urgent'],
+    default: 'general'
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  expiryDate: {
+    type: Date
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   }
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
-export default mongoose.model("Announcement", announcementSchema);
+const Announcement = mongoose.model('Announcement', announcementSchema);
+export default Announcement;

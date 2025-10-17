@@ -12,13 +12,19 @@ import announcementRoutes from "./routes/announcementRoutes.js";
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow requests from your frontend
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // MongoDB connect
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error(err));
+  .catch((err) => console.error(err));
 
 // Route Middleware
 app.use("/api/users", userRoutes);

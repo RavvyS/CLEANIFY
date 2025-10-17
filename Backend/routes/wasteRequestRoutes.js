@@ -1,46 +1,90 @@
+// Backend/routes/wasteRequestRoutes.js
 import express from "express";
 import WasteRequest from "../models/WasteRequest.js";
 
 const router = express.Router();
 
-// ✅ Get all requests
-router.get("/", async (req, res) => {
-  try {
-    const requests = await WasteRequest.find().populate("userId collectorId", "name role");
-    res.json(requests);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ✅ Create new waste request (householder)
+// Create a new waste request
 router.post("/", async (req, res) => {
   try {
-    const newRequest = new WasteRequest(req.body);
-    await newRequest.save();
-    res.status(201).json(newRequest);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const wasteRequest = new WasteRequest(req.body);
+    await wasteRequest.save();
+    res.status(201).json(wasteRequest);
+  } catch (error) {
+    res.status(400).json({ message: "Error creating request", error: error.message });
   }
 });
 
-// ✅ Update request (collector updates status or remark)
+// Get all waste requests
+router.get("/", async (req, res) => {
+  try {
+    const wasteRequests = await WasteRequest.find()
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+    res.status(200).json(wasteRequests);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching requests", error: error.message });
+  }
+});
+
+// Get waste request by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const wasteRequest = await WasteRequest.findById(req.params.id)
+      .populate('userId', 'name email');
+    
+    if (!wasteRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    
+    res.status(200).json(wasteRequest);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching request", error: error.message });
+  }
+});
+
+// Update waste request
 router.put("/:id", async (req, res) => {
   try {
-    const updated = await WasteRequest.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const wasteRequest = await WasteRequest.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!wasteRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.status(200).json(wasteRequest);
+  } catch (error) {
+    res.status(400).json({ message: "Error updating request", error: error.message });
   }
 });
 
-// ✅ Delete request (optional)
+// Delete waste request
 router.delete("/:id", async (req, res) => {
   try {
-    await WasteRequest.findByIdAndDelete(req.params.id);
-    res.json({ message: "Request deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const wasteRequest = await WasteRequest.findByIdAndDelete(req.params.id);
+    
+    if (!wasteRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    
+    res.status(200).json({ message: "Request deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting request", error: error.message });
+  }
+});
+
+// Get user's waste requests
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const wasteRequests = await WasteRequest.find({ userId: req.params.userId })
+      .sort({ createdAt: -1 });
+    res.status(200).json(wasteRequests);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user requests", error: error.message });
   }
 });
 
