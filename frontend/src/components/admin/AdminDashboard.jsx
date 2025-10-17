@@ -30,7 +30,8 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 import RouteIcon from '@mui/icons-material/Route';
 import GroupIcon from '@mui/icons-material/Group';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
-import { wasteRequestAPI, announcementAPI } from '@/services/api';
+import { wasteRequestAPI, announcementAPI } from '../../services/api';
+import ActivityFeed from './ActivityFeed';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -67,6 +68,60 @@ const AdminDashboard = () => {
     recyclingRate: 42,
     binFillRate: 68
   });
+
+  // Sample recent activity data
+  const recentActivity = [
+    {
+      id: 1,
+      type: 'collection',
+      description: 'Zone A collection completed',
+      status: 'success',
+      timestamp: new Date()
+    },
+    {
+      id: 2,
+      type: 'route',
+      description: 'New route created for Zone B',
+      status: 'info',
+      timestamp: new Date(Date.now() - 3600000)
+    },
+    {
+      id: 3,
+      type: 'alert',
+      description: 'Bin overflow reported at Beach Road',
+      status: 'warning',
+      timestamp: new Date(Date.now() - 7200000)
+    },
+    {
+      id: 4,
+      type: 'maintenance',
+      description: 'Truck TRK-001 scheduled for maintenance',
+      status: 'pending',
+      timestamp: new Date(Date.now() - 10800000)
+    }
+  ];
+
+  // Sample insights data
+  const insights = [
+    {
+      title: 'Recycling Rate Increase',
+      description: 'Zone B shows 15% increase in recycling participation',
+      recommendation: 'Expand awareness programs to other zones',
+      impact: 'high'
+    },
+    {
+      title: 'Collection Efficiency',
+      description: 'Average collection time reduced by 20 minutes',
+      recommendation: 'Apply optimized routes to remaining zones',
+      impact: 'medium'
+    },
+    {
+      title: 'Bin Maintenance',
+      description: '5 bins require immediate attention',
+      recommendation: 'Schedule maintenance team for this week',
+      impact: 'medium'
+    }
+  ];
 
   useEffect(() => {
     fetchDashboardData();
