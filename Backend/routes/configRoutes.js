@@ -5,7 +5,10 @@ import {
     getActiveConfig,
     createConfig,
     updateConfig,
-    getConfigVersions
+    updateConfigById,
+    getConfigVersions,
+    deleteConfig,
+    toggleConfigActive
 } from '../controllers/configController.js';
 
 const router = express.Router();
@@ -14,14 +17,26 @@ const router = express.Router();
 router.use(protect);
 router.use(adminOnly);
 
+// Test route to verify the router is working
+router.get('/test', (req, res) => {
+    res.json({ message: 'Config routes are working!' });
+});
+
+// More specific routes first
+router.get('/city/:cityId/versions', getConfigVersions);
+router.route('/city/:cityId')
+    .get(getActiveConfig)
+    .put(updateConfig);
+
+// General routes
 router.route('/')
     .get(getAllConfigs)
     .post(createConfig);
 
-router.route('/:cityId')
-    .get(getActiveConfig)
-    .put(updateConfig);
-
-router.get('/:cityId/versions', getConfigVersions);
+// ID-based routes last
+router.route('/:id')
+    .delete(deleteConfig)
+    .patch(toggleConfigActive)
+    .put(updateConfigById);
 
 export default router;

@@ -12,10 +12,15 @@ const announcementSchema = new mongoose.Schema({
     required: [true, "Content is required"],
     trim: true
   },
-  type: {
+  priority: {
     type: String,
-    enum: ['general', 'important', 'urgent'],
-    default: 'general'
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  targetAudience: {
+    type: String,
+    enum: ['all', 'admin', 'dispatcher', 'collector', 'householder'],
+    default: 'all'
   },
   date: {
     type: Date,

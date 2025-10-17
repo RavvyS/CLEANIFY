@@ -11,6 +11,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CityConfiguration from "./pages/CityConfiguration";
+import RouteManagement from "./pages/RouteManagement";
+import UserManagement from "./pages/UserManagement";
+import AnnouncementManagement from "./pages/AnnouncementManagement";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 const theme = createTheme({
@@ -49,6 +52,30 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <CityConfiguration />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/routes"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <RouteManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <UserManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/announcements"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AnnouncementManagement />
                 </ProtectedRoute>
               }
             />

@@ -22,6 +22,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -35,18 +36,26 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const Login = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+    
     if (!formData.email || !formData.password) {
       toast.error("Please enter both email and password");
       return;
     }
+    
+    setLoading(true);
     try {
       const response = await authAPI.login(formData);
       const { token, user } = response.data;
@@ -68,6 +77,8 @@ const Login = () => {
       } else {
         toast.error(error.response?.data?.message || "Login failed. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 

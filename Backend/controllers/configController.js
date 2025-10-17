@@ -79,7 +79,7 @@ export const createConfig = async (req, res) => {
 };
 
 // @desc    Update city configuration
-// @route   PUT /api/config/:cityId
+// @route   PUT /api/configs/city/:cityId
 // @access  Private/Admin
 export const updateConfig = async (req, res) => {
     try {
@@ -123,8 +123,42 @@ export const updateConfig = async (req, res) => {
     }
 };
 
+// @desc    Update configuration by ID
+// @route   PUT /api/configs/:id
+// @access  Private/Admin
+export const updateConfigById = async (req, res) => {
+    try {
+        const config = await CityConfig.findById(req.params.id);
+
+        if (!config) {
+            return res.status(404).json({ message: 'Configuration not found' });
+        }
+
+        // Validate new configuration
+        const validationResult = validateConfig(req.body);
+        if (!validationResult.isValid) {
+            return res.status(400).json({ 
+                message: 'Invalid configuration',
+                errors: validationResult.errors 
+            });
+        }
+
+        // Update the configuration
+        const updatedConfig = await CityConfig.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        res.json(updatedConfig);
+    } catch (error) {
+        console.error('Update Config By ID Error:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
 // @desc    Get configuration version history
-// @route   GET /api/config/:cityId/versions
+// @route   GET /api/configs/city/:cityId/versions
 // @access  Private/Admin
 export const getConfigVersions = async (req, res) => {
     try {
@@ -135,6 +169,56 @@ export const getConfigVersions = async (req, res) => {
         res.json(versions);
     } catch (error) {
         console.error('Get Versions Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete city configuration
+// @route   DELETE /api/configs/:id
+// @access  Private/Admin
+export const deleteConfig = async (req, res) => {
+    try {
+        console.log('Delete request received for ID:', req.params.id);
+        
+        const config = await CityConfig.findById(req.params.id);
+
+        if (!config) {
+            console.log('Configuration not found for ID:', req.params.id);
+            return res.status(404).json({ message: 'Configuration not found' });
+        }
+
+        console.log('Found config:', config.cityName, 'Deleting...');
+        await CityConfig.findByIdAndDelete(req.params.id);
+
+        console.log('Configuration deleted successfully');
+        res.json({ message: 'Configuration deleted successfully' });
+    } catch (error) {
+        console.error('Delete Config Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Toggle configuration active status
+// @route   PATCH /api/configs/:id
+// @access  Private/Admin
+export const toggleConfigActive = async (req, res) => {
+    try {
+        console.log('Toggle request received for ID:', req.params.id, 'isActive:', req.body.isActive);
+        
+        const config = await CityConfig.findById(req.params.id);
+
+        if (!config) {
+            console.log('Configuration not found for ID:', req.params.id);
+            return res.status(404).json({ message: 'Configuration not found' });
+        }
+
+        config.isActive = req.body.isActive;
+        await config.save();
+
+        console.log('Configuration toggled successfully');
+        res.json(config);
+    } catch (error) {
+        console.error('Toggle Config Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -182,5 +266,8 @@ export default {
     getActiveConfig,
     createConfig,
     updateConfig,
-    getConfigVersions
+    updateConfigById,
+    getConfigVersions,
+    deleteConfig,
+    toggleConfigActive
 };

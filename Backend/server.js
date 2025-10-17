@@ -6,6 +6,8 @@ import cors from "cors";
 // Routes
 import authRoutes from "./routes/authRoutes.js";
 import configRoutes from "./routes/configRoutes.js";
+import routeRoutes from "./routes/routeRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import wasteRequestRoutes from "./routes/wasteRequestRoutes.js";
 import inquiryRoutes from "./routes/inquiryRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
@@ -30,6 +32,8 @@ mongoose
 // Route Middleware
 app.use("/api/auth", authRoutes);
 app.use("/api/configs", configRoutes);
+app.use("/api/routes", routeRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/requests", wasteRequestRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/announcements", announcementRoutes);
